@@ -44,12 +44,10 @@ fn main() -> Result<()> {
         let user_output = print_now(r#"type (for quit ":quit"): "#)?;
 
         match user_output.as_str() {
-            ":quit" => {
-                break
-            }
+            ":quit" => break,
             _ => {
                 println!("You typed: {}", user_output);
-                writeln!(logger, "{}", user_output.trim())?;
+                writeln!(logger, "{}", user_output)?;
             },
         }
     }
