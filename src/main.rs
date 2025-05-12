@@ -1,6 +1,6 @@
 use std::{
     fs::OpenOptions,
-    io::{self, Result, Write}
+    io::{self, Result, Write}, 
 };
 
 fn draw_ascii() {
@@ -13,7 +13,9 @@ fn draw_ascii() {
 }
 
 fn print_now(prompt: &str) -> Result<String> {
-    print!("{}", prompt);
+    let mut stdout = io::stdout();
+
+    write!(stdout, "{}", prompt)?;
     io::stdout().flush()?;
 
     let mut input = String::new();
@@ -27,30 +29,30 @@ fn sleeep(time: u64) {
 }
 
 fn main() -> Result<()> {
-    draw_ascii();
-    sleeep(900);
-    println!("Wait a moment");
-    sleeep(2500);
-
     let mut logger = OpenOptions::new()
         .append(true)
         .create(true)
         .open("/tmp/echotale_history.txt")?;
 
+    draw_ascii();
+    sleeep(900);
+    println!("Wait a moment");
+    sleeep(2500);
+
+
     loop {
         let user_output = print_now(r#"type (for quit ":quit"): "#)?;
 
-        match user_output.trim() {
+        match user_output.as_str() {
             ":quit" => {
-                println!("User Quit...");
-                writeln!(logger, "{}", user_output.trim())?;
                 break
             }
-            _ => writeln!(logger, "{}", user_output.trim())?,
+            _ => {
+                println!("You typed: {}", user_output);
+                writeln!(logger, "{}", user_output.trim())?;
+            },
         }
-        println!("{}", user_output);
     }
+    println!("file path: /tmp/echotale_history.txt");
     Ok(())
 }
-
-
