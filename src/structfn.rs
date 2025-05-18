@@ -15,15 +15,13 @@ impl EchoSystem {
     }
 
     pub fn print_now(prompt: &str) -> Result<String> {
-        let mut stdout = io::stdout();
-
-        write!(stdout, "{}", prompt)?;
+        print!("{}", prompt);
         io::stdout().flush()?;
 
         let mut input = String::new();
         io::stdin().read_line(&mut input)?;
 
-        Ok(input.trim().to_string())
+        Ok(input)
     }
 
     pub fn sleeep(time: u64) {
