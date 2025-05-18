@@ -31,6 +31,6 @@ fn main() -> Result<()> {
             writeln!(logger, "{}", user_output)?;
         }
     }
-    println!("file path: /tmp/echotale_history.txt");
+    print!("file path: /tmp/echotale_history.txt");
     Ok(())
 }
