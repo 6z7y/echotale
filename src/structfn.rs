@@ -14,7 +14,7 @@ impl EchoSystem {
         "#);
     }
 
-    pub fn print_now(prompt: &str) -> Result<String> {
+    pub fn print_new(prompt: &str) -> Result<String> {
         print!("{}", prompt);
         io::stdout().flush()?;
 
