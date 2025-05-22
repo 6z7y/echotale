@@ -1,4 +1,5 @@
 use std::{
+    collections::HashSet,
     fs::{File, OpenOptions},
     io::{BufRead, BufReader, Result, Write} 
 };
@@ -7,16 +8,14 @@ mod structfn;
 use crate::structfn::{
     EchoSystem,
     Opration,
-    Time
+    Time,
+    Permission,
+    User
 };
 
 const FILE_PATH: &str = "/tmp/echotale_history.txt";
 
 fn main() -> Result<()> {
-    let mut logger = OpenOptions::new()
-        .append(true)
-        .create(true)
-        .open(FILE_PATH)?;
 
     EchoSystem::draw_ascii();
     EchoSystem::sleeep(900);
@@ -25,10 +24,16 @@ fn main() -> Result<()> {
 
     loop {
         let user_output = EchoSystem::print_new("type (':?' for help): ")?;
+
         if user_output.is_empty() {
             println!("empty text!");
             continue;
         } else {
+        let mut logger = OpenOptions::new()
+            .append(true)
+            .create(true)
+            .open(FILE_PATH)?;
+
             println!("You weote: {}", user_output);
             writeln!(logger, "{}", user_output)?;
 
@@ -91,17 +96,17 @@ fn main() -> Result<()> {
                 let reader = BufReader::new(file);
 
                 // Step 3: Read lines and filter
-                let results: Vec<_> = reader
+                let results: HashSet<_> = reader
                     .lines()
                     .filter_map(Result::ok)
                     .filter(|line| line.contains(&keyword))
-                    .collect::<Vec<_>>();
+                    .collect();
 
                 // Step 4: print results
                 if results.is_empty() {
                     println!("No matching results.");
                 } else {
-                    println!("Found {} result(s):", results.len());
+                    // println!("Found {} result(s):", results.len());
                     for line in results {
                         println!("- {}", line);
                     }
@@ -124,7 +129,87 @@ fn main() -> Result<()> {
                     }
                     Err(msg) => println!("invlid format: {}", msg)
                 }
-                
+            } else if user_output == ":user" {
+                let mut users: Vec<User> = Vec::new();
+
+                loop {
+                    let command = EchoSystem::print_new("\nType a command (add, list, select, toggle, exit): ")?;
+
+                    match command.as_str() {
+                        "add" => {
+                            // Get user name
+                            let name = EchoSystem::print_new("Enter name: ")?;
+
+                            // Get permission.
+                            let perm_input = EchoSystem::print_new("Enter permission (root/user/guest): ")?;
+
+                            let permission = match perm_input.as_str() {
+                                "root" => Permission::Root,
+                                "user" => Permission::User,
+                                "guest" => Permission::Guest,
+                                _ => {
+                                    println!("Invalid permisiion!");
+                                    continue;
+                                }
+                            };
+
+                            let user = User::new(&name, permission);
+                            users.push(user);
+                            println!("User added.");
+                        }
+                        "toggle" => {
+                            let name = EchoSystem::print_new("Enter user name to toggle active: ")?;
+                            let mut found = false;
+
+                            for user in &mut users {
+                                if user.name == name {
+                                    user.toggle_active();
+                                    println!("Toggled user '{}' Now active: {}", user.name, user.is_active);
+                                    found = true;
+                                    break;
+                                }
+                            }
+
+                            if !found {
+                                println!("User not found.");
+                            }
+                        }
+                        "list" => {
+                            println!("\n--- All Users ---");
+                            User::list_users(&users);
+                        }
+                        "select" => {
+                            let perm_input = EchoSystem::print_new("Select permisiion to show users (root/user/guest): ")?;
+
+                            let selected_permision = match perm_input.as_str() {
+                                "root" => Permission::Root,
+                                "user" => Permission::User,
+                                "guest" => Permission::Guest,
+                                _ => {
+                                    println!("Invalid permission");
+                                    continue;
+                                }
+                            };
+
+                            println!("Users with {:?} permission:", selected_permision);
+                            let mut found = false;
+                            for user in &users {
+                                if user.permission == selected_permision {
+                                    user.info();
+                                    found = true;
+                                }
+                            }
+                            if !found {
+                                println!("No users found with that permission.");
+                            }
+                        }
+                        "exit" => {
+                            println!("Exiting...");
+                            break;
+                        }
+                        _ => println!("unknown command")
+                    }
+                }
             } else if user_output == ":quit" {
                 break;
             } else if user_output == ":?" {
@@ -135,6 +220,7 @@ fn main() -> Result<()> {
                     :show       - Show history\n\
                     :search     - Search history\n\
                     :time       - Time System\n\
+                    :user       - Make list user\n\
                     :quit       - Exit the program\n\
                     :?          - Show this help message\n\
                     ")

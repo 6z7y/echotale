@@ -11,7 +11,20 @@ pub enum Opration {
 
 pub struct Time {
     pub hour: u32,
-    pub minute: u32,
+    pub minute: u32
+}
+
+#[derive(Debug, PartialEq)]
+pub enum Permission {
+    Guest,
+    User,
+    Root
+}
+
+pub struct User {
+    pub name: String,
+    pub permission: Permission,
+    pub is_active: bool
 }
 
 impl EchoSystem {
@@ -31,7 +44,7 @@ impl EchoSystem {
         let mut input = String::new();
         io::stdin().read_line(&mut input)?;
 
-        Ok(input.trim().to_string())
+        Ok(input.trim().to_string().to_lowercase())
     }
 
     pub fn sleeep(time: u64) {
@@ -92,5 +105,30 @@ impl Opration {
                 a / b
             }
         }
+    }
+}
+
+impl User {
+    pub fn new(name: &str, permission: Permission) -> Self {
+        Self {
+            name: name.to_string(),
+            permission,
+            is_active: true
+        }
+    }
+
+    pub fn info(&self) {
+        println!("Name: {}, Permission {:?}, is Active {}",
+            self.name, self.permission, self.is_active);
+    }
+
+    pub fn list_users(users: &[User]) {
+        for user in users {
+            user.info();
+        }
+    }
+    
+    pub fn toggle_active(&mut self) {
+        self.is_active = !self.is_active
     }
 }
