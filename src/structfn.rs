@@ -9,6 +9,11 @@ pub enum Opration {
     Divide
 }
 
+pub struct Student {
+    pub name: String,
+    pub grade: u8
+}
+
 pub struct Time {
     pub hour: u32,
     pub minute: u32
@@ -49,6 +54,29 @@ impl EchoSystem {
 
     pub fn sleeep(time: u64) {
         std::thread::sleep(std::time::Duration::from_millis(time))
+    }
+}
+
+impl Student {
+    pub fn check_student(&self) {
+        println!("check about {}", self.name);
+
+        if self.grade < 50 {
+            println!("failed get out");
+        }
+
+        if self.grade >= 50 && self.grade < 70 {
+            println!("Barely Passed");
+        }
+
+        if self.grade >= 70 && self.grade < 90 {
+            println!("Good");
+        }
+
+        if self.grade >= 90 {
+            println!("Execllent");
+        }
+        println!("-------------------")
     }
 }
 
