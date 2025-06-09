@@ -5,7 +5,20 @@ use std::{
 };
 
 use crate::{
-    func::{Adventurer, EchoSystem, MagicGem, Opration, Permission, Rarity, Student, Time, User}, log::{logger, FILE_PATH}
+    func::{
+        Adventurer, 
+        EchoSystem, 
+        MagicGem, 
+        Opration, 
+        Permission, 
+        Rarity, 
+        Student, 
+        Status,
+        Task,
+        Time, 
+        User
+    }, 
+    log::{logger, FILE_PATH}
 };
 
 pub fn loops() -> Result<()> {
@@ -159,7 +172,56 @@ pub fn loops() -> Result<()> {
                     student.check_student();
                 }
 
+            } else if user_output == ":task" {
 
+                let mut tasks: Vec<Task> = Vec::new();
+
+                let count_input = EchoSystem::print_new("how much task you want? ")?;
+                let count: u32 = count_input.parse().unwrap_or(0);
+
+                for i in 0..count {
+                    println!("\n--- task num {} ---", i + 1);
+                    let title = EchoSystem::print_new("enter title: ")?;
+                    let description = EchoSystem::print_new("description of task: ")?;
+                    let priority_input = EchoSystem::print_new("prioity task (num): ")?;
+                    let priority: u8 = priority_input.parse().unwrap_or(1);
+
+                    let task = Task {
+                        title,
+                        description,
+                        priority,
+                        status: Status::Pending
+                    };
+                    tasks.push(task);
+                }
+
+                println!("\n--- list task ---");
+                for (i, task) in tasks.iter().enumerate() {
+                    println!("{}) {} - status: {:?}", i, task.title, task.status);
+                }
+
+                let index_input = EchoSystem::print_new("Enter task number to update (0 or 1): ")?;
+                let index: usize = index_input.parse().unwrap_or(0);
+
+                if let Some(task) = tasks.get_mut(index) {
+                    let status_input = EchoSystem::print_new("Enter new status (pending / inprogress / completed): ")?;
+                    task.status = match status_input.to_lowercase().as_str() {
+                        "pending" => Status::Pending,
+                        "inprogress" => Status::InProgress,
+                        "completed" => Status::Completed,
+                        _ => {
+                            println!("Invalid input. Keeping old status.");
+                            task.status.clone()
+                        }
+                    };
+                } else {
+                    println!("no task in this number.");
+                }
+
+                println!("\nUpdated Task:");
+                for task in &tasks {
+                    println!("Task: {}, Status: {:?}", task.title, task.status);
+                }
             } else if user_output == ":time" {
                 loop {
                     println!("\nHint: '23:59'\n");
@@ -276,6 +338,7 @@ pub fn loops() -> Result<()> {
                     :show       - Show history\n\
                     :search     - Search history\n\
                     :student    - Result students\n\
+                    :task       - add tasks\n\
                     :time       - Time System\n\
                     :user       - Make list user\n\
                     :quit       - Exit the program\n\

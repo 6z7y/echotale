@@ -35,6 +35,21 @@ pub struct Student {
     pub grade: u8
 }
 
+#[derive(Debug, Clone)]
+pub enum Status {
+    Pending,
+    InProgress,
+    Completed,
+}
+
+#[derive(Debug)]
+pub struct Task {
+    pub title: String,
+    pub description: String,
+    pub priority: u8,
+    pub status: Status
+}
+
 pub struct Time {
     pub hour: u32,
     pub minute: u32
