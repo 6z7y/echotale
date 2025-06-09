@@ -1,9 +1,9 @@
-mod structfn;
+mod func;
 mod log;
 mod loops;
 
 use crate::{
-    structfn::EchoSystem,
+    func::EchoSystem,
     loops::loops
 };
 

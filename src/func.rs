@@ -1,5 +1,26 @@
 use std::io::{self, Write};
 
+#[derive(Debug)]
+pub enum Rarity {
+    Common,
+    Rare,
+    Legendary,
+    Epic
+}
+
+#[derive(Debug)]
+pub struct MagicGem {
+    pub color: String,
+    pub power: u32,
+    pub rarity: Rarity
+}
+
+#[derive(Debug)]
+pub struct Adventurer {
+    pub name: String,
+    pub gems: Vec<MagicGem>
+}
+
 pub struct EchoSystem;
 
 pub enum Opration {
@@ -54,6 +75,27 @@ impl EchoSystem {
 
     pub fn sleeep(time: u64) {
         std::thread::sleep(std::time::Duration::from_millis(time))
+    }
+}
+
+impl Adventurer {
+    pub fn new(name: &str) -> Self {
+        Adventurer { 
+            name: name.into(),
+            gems: Vec::new()
+        }
+    }
+
+    pub fn collect_gem(&mut self, gem: MagicGem) {
+        println!("collect gem: {}", self.name);
+        self.gems.push(gem)
+    }
+
+    pub fn report(&self){
+        println!("\n--- report adv: {} ---", self.name);
+        for gem in &self.gems {
+            println!("gem: color: {}, power: {}, rarity: {:?}", gem.color, gem.power, gem.rarity)
+        }
     }
 }
 

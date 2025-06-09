@@ -5,8 +5,7 @@ use std::{
 };
 
 use crate::{
-    log::{FILE_PATH, logger},
-    structfn::{EchoSystem, Opration, Student, Time, Permission, User}
+    func::{Adventurer, EchoSystem, MagicGem, Opration, Permission, Rarity, Student, Time, User}, log::{logger, FILE_PATH}
 };
 
 pub fn loops() -> Result<()> {
@@ -63,6 +62,40 @@ pub fn loops() -> Result<()> {
             } else if user_output == ":clear" {
                 std::fs::write(FILE_PATH, "")?;
                 println!("History cleared.");
+            } else if user_output == ":gem" {
+                let name = EchoSystem::print_new("enter your name: ");
+                let mut hero = Adventurer::new(name?.as_str());
+
+                let gem_count_input = EchoSystem::print_new("howw much gem you want to catch? ");
+                let gem_count: u32 = gem_count_input?.parse::<u32>().unwrap_or(0);
+
+                for i in 1..gem_count {
+                    println!("\n--- gem number {} ---", i);
+                    let color = EchoSystem::print_new("color gem: ")?;
+                    let power_input = EchoSystem::print_new("power gem (number): ");
+                    let power: u32 = power_input?.parse().unwrap_or(0);
+
+                    let rarity_input = EchoSystem::print_new("gem (common / Rare / Legendary / Epic): ");
+                    let rarity = match rarity_input?.to_lowercase().as_str() {
+                        "common" => Rarity::Common,
+                        "rare" => Rarity::Rare,
+                        "legendary" => Rarity::Legendary,
+                        "epic" => Rarity::Epic,
+                        _ => {
+                            println!("error input, default common");
+                            Rarity::Common
+                        }
+                    };
+
+                    let gem = MagicGem {
+                        color,
+                        power,
+                        rarity
+                    };
+
+                    hero.collect_gem(gem);
+                }
+                hero.report();
             } else if user_output == ":show" {
                 let result = std::fs::read_to_string(FILE_PATH)?;
 
@@ -239,6 +272,7 @@ pub fn loops() -> Result<()> {
                 \nAvailable commands:\n\
                     :calculate  - Calculate menu\n\
                     :clear      - Clear history\n\
+                    :gem        - catch stone\n\
                     :show       - Show history\n\
                     :search     - Search history\n\
                     :student    - Result students\n\
