@@ -23,11 +23,11 @@ pub struct Adventurer {
 
 pub struct EchoSystem;
 
-pub enum Opration {
+pub enum Operator {
     Add,
-    Subtract,
-    Multiply,
-    Divide
+    Sub,
+    Mul,
+    Div
 }
 
 pub struct Student {
@@ -167,28 +167,14 @@ impl Time {
     }
 }
 
-impl Opration {
-    pub fn from_str(op: &str) -> Option<Self> {
+impl Operator {
+    pub fn parse_operator(op: &str) -> Option<Self> {
         match op {
-            "+" => Some(Opration::Add),
-            "-" => Some(Opration::Subtract),
-            "*" => Some(Opration::Multiply),
-            "/" => Some(Opration::Divide),
+            "+" => Some(Operator::Add),
+            "-" => Some(Operator::Sub),
+            "*" => Some(Operator::Mul),
+            "/" => Some(Operator::Div),
             _ => None
-        }
-    }
-
-    pub fn apply(&self, a: f64, b: f64) -> f64 {
-        match self {
-            Self::Add => a + b,
-            Self::Subtract => a - b,
-            Self::Multiply => a * b,
-            Self::Divide => {
-                if b == 0.0 {
-                    println!("Cannot Divide by zero!")
-                }
-                a / b
-            }
         }
     }
 }

@@ -1,7 +1,7 @@
 use std::{
     collections::HashSet,
     fs::File,
-    io::{BufRead, BufReader, Result} 
+    io::{self, BufRead, BufReader, Result} 
 };
 
 use crate::{
@@ -9,13 +9,13 @@ use crate::{
         Adventurer, 
         EchoSystem, 
         MagicGem, 
-        Opration, 
+        Operator,
         Permission, 
-        Rarity, 
-        Student, 
+        Rarity,
+        Student,
         Status,
         Task,
-        Time, 
+        Time,
         User
     }, 
     log::{logger, FILE_PATH}
@@ -32,45 +32,47 @@ pub fn loops() -> Result<()> {
             logger(&user_output);
 
             if user_output == ":calculate" {
+                println!("Enter expression (5 * 3) or 'exit'");
                 loop {
-                    println!("\nHint: '2 * 5'\n");
-                    let prompt = EchoSystem::print_new("cacl> ")?;
 
-                    if prompt == ":quit" {
-                        break;
+                    let mut input = String::new();
+                    io::stdin().read_line(&mut input).unwrap();
+
+                    let trimmed = input.trim();
+
+                    if trimmed.eq_ignore_ascii_case("exit") {
+                        break
                     }
 
-                    let parts: Vec<&str> = prompt.split_whitespace().collect();
+                    let parts: Vec<&str> = trimmed.split_whitespace().collect();
+
                     if parts.len() != 3 {
-                        println!("type like (3 + 4)");
+                        println!("Invalid format. Use number operator number");
+                        continue;
                     }
 
-                    let a = match parts[0].parse::<f64>() {
-                        Ok(n) => n,
-                        Err(_) => {
-                            println!("first number invalid");
-                            continue;
-                        }
-                    };
+                    let num1 = parts[0].parse::<i32>();
+                    let op = Operator::parse_operator(parts[1]);
+                    let num2 = parts[2].parse::<i32>();
 
-                    let op = match Opration::from_str(parts[1]) {
-                        Some(op) => op,
-                        None => {
-                            println!("error type (+ - * /)");
-                            continue;
+                    match (num1, op, num2) {
+                        (Ok(a), Some(op), Ok(b)) => {
+                            match op {
+                                Operator::Add => println!("Result: {} + {} = {}", a, b, a + b),
+                                Operator::Sub => println!("Result: {} - {} = {}", a, b, a - b),
+                                Operator::Mul => println!("Result: {} * {} = {}", a, b, a * b),
+                                Operator::Div => {
+                                    if b == 0 {
+                                        println!("cannot divide by zero");
+                                        continue;
+                                    } else {
+                                        println!("Result: {} / {} = {}", a, b, a / b)
+                                    }
+                                }
+                            }
                         }
-                    };
-
-                    let b = match parts[2].parse::<f64>() {
-                        Ok(n) => n,
-                        Err(_) => {
-                            println!("second number invalid");
-                            continue;
-                        }
-                    };
-
-                    let result = op.apply(a, b);
-                    println!("= {}", result)
+                        _ => println!("Error operator")
+                    }
                 }
             } else if user_output == ":clear" {
                 std::fs::write(FILE_PATH, "")?;
