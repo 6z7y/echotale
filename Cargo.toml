@@ -1,6 +1,8 @@
 [package]
 name = "echotale"
-version = "1.0.1"
+version = "1.1.0"
 edition = "2024"
 
 [dependencies]
+nu-ansi-term = "0.50.1"
+reedline = "0.40.0"

@@ -1,5 +1,4 @@
 mod func;
-mod log;
 mod loops;
 
 use crate::{
